@@ -1,0 +1,838 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Choose One ✨</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #ffd6e7, #d8f3ff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.container {
+    width: 92%;
+    max-width: 650px;
+    min-height: 560px;
+    background: rgba(255,255,255,0.94);
+    border-radius: 30px;
+    padding: 30px 25px;
+    text-align: center;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.sticker {
+    width: 190px;
+    height: 190px;
+    object-fit: contain;
+    margin: 5px auto 15px;
+    display: block;
+    transition: 0.4s ease;
+}
+
+h1 {
+    font-size: 30px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.description {
+    min-height: 65px;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #555;
+    margin: 0 auto 25px;
+    max-width: 500px;
+}
+
+.next-btn,
+.choice-btn {
+    border: none;
+    border-radius: 18px;
+    padding: 14px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    box-shadow: 0 7px 18px rgba(0,0,0,0.15);
+}
+
+.next-btn {
+    background: #ff72a8;
+    color: white;
+}
+
+.next-btn:hover {
+    transform: translateY(-3px);
+    background: #ff4f91;
+}
+
+.choice-area {
+    position: relative;
+    height: 190px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.choice-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%) scale(1);
+    min-width: 135px;
+}
+
+#wrongBtn {
+    left: 7%;
+    background: #8ecae6;
+    color: #123;
+}
+
+#rightBtn {
+    right: 7%;
+    background: #ff72a8;
+    color: white;
+    z-index: 5;
+}
+
+.fade {
+    animation: fade 0.45s ease;
+}
+
+@keyframes fade {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.final-message {
+    animation: finalAppear 0.8s ease;
+}
+
+@keyframes finalAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.7);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    top: -20px;
+    z-index: 100;
+    animation: fall 3s linear forwards;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    100% {
+        transform: translateY(110vh) rotate(720deg);
+    }
+}
+
+.float-effect {
+    position: fixed;
+    bottom: -30px;
+    font-size: 25px;
+    pointer-events: none;
+    z-index: 101;
+    animation: floatUp 3s linear forwards;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-110vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@media (max-width: 500px) {
+
+    .container {
+        width: 94%;
+        min-height: 520px;
+        padding: 25px 15px;
+    }
+
+    .sticker {
+        width: 155px;
+        height: 155px;
+    }
+
+    h1 {
+        font-size: 25px;
+    }
+
+    .description {
+        font-size: 16px;
+    }
+
+    .choice-area {
+        height: 180px;
+    }
+
+    .choice-btn {
+        min-width: 105px;
+        padding: 12px 18px;
+        font-size: 16px;
+    }
+
+    #wrongBtn {
+        left: 1%;
+    }
+
+    #rightBtn {
+        right: 1%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="app">
+
+    <img
+        id="sticker"
+        class="sticker"
+        src="images/sticker1.gif"
+        alt="Sticker"
+    >
+
+    <h1 id="headline"></h1>
+
+    <div id="description" class="description"></div>
+
+    <button id="nextBtn" class="next-btn"></button>
+
+    <div id="choiceArea" class="choice-area" style="display:none;">
+
+        <button id="wrongBtn" class="choice-btn"></button>
+
+        <button id="rightBtn" class="choice-btn"></button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   EDIT ONLY THIS SECTION
+   ========================================================= */
+
+const CONFIG = {
+
+    /* ================= SCREEN 1 ================= */
+
+    screen1: {
+
+        sticker: "images/sticker1.gif",
+
+        headline: "စိတ်ကောက်နေတဲ့က‌လေးလေးရေ🤭",
+
+        description:
+            "ကိုကို့ကိုစိတ်မကောက်ပါနဲ့တော့ဗျာ🤪"
+          "ကိုကိုအလုပ်နည်းနည်းများသွားလို့ပါနော်",
+
+        button:
+            "Next →"
+    },
+
+
+    /* ================= SCREEN 2 ================= */
+
+    screen2: {
+
+        sticker: "images/sticker2.gif",
+
+        description:
+            "Okay... now we are getting closer. There is one final thing you need to choose.",
+
+        button:
+            "I'm Ready →"
+    },
+
+
+    /* ================= CHOICE ================= */
+
+    choice: {
+
+        sticker:
+            "images/choice.gif",
+
+        description:
+            "Choose one carefully... 👀",
+
+        wrongButton:
+            "Option A",
+
+        rightButton:
+            "Option B"
+    },
+
+
+    /* ================= WRONG CLICKS ================= */
+
+    wrongAttempts: [
+
+        {
+            sticker:
+                "images/wrong1.gif",
+
+            description:
+                "Hmm... are you sure about that? 😏"
+        },
+
+        {
+            sticker:
+                "images/wrong2.gif",
+
+            description:
+                "Nope! Try again! 😂"
+        },
+
+        {
+            sticker:
+                "images/wrong3.gif",
+
+            description:
+                "Look at the other button... 👀"
+        },
+
+        {
+            sticker:
+                "images/wrong4.gif",
+
+            description:
+                "You're making the correct button bigger! 😳"
+        },
+
+        {
+            sticker:
+                "images/wrong5.gif",
+
+            description:
+                "Okay... the wrong choice is becoming impossible! 😂"
+        }
+
+    ],
+
+
+    /* ================= FINAL ================= */
+
+    final: {
+
+        sticker:
+            "images/final.gif",
+
+        description:
+            "You chose the right one! 🎉<br><br>Thank you for playing! ✨",
+
+        button:
+            "Celebrate 🎉"
+    }
+
+};
+
+
+/* =========================================================
+   VARIABLES
+   ========================================================= */
+
+let currentScreen = 1;
+
+let wrongCount = 0;
+
+let rightSize = 1;
+
+let wrongSize = 1;
+
+
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
+
+const app =
+    document.getElementById("app");
+
+const sticker =
+    document.getElementById("sticker");
+
+const headline =
+    document.getElementById("headline");
+
+const description =
+    document.getElementById("description");
+
+const nextBtn =
+    document.getElementById("nextBtn");
+
+const choiceArea =
+    document.getElementById("choiceArea");
+
+const wrongBtn =
+    document.getElementById("wrongBtn");
+
+const rightBtn =
+    document.getElementById("rightBtn");
+
+
+/* =========================================================
+   ANIMATION
+   ========================================================= */
+
+function animateChange() {
+
+    app.classList.remove("fade");
+
+    void app.offsetWidth;
+
+    app.classList.add("fade");
+
+}
+
+
+/* =========================================================
+   SCREEN 1
+   ========================================================= */
+
+function showScreen1() {
+
+    sticker.src =
+        CONFIG.screen1.sticker;
+
+    headline.innerHTML =
+        CONFIG.screen1.headline;
+
+    description.innerHTML =
+        CONFIG.screen1.description;
+
+    nextBtn.innerHTML =
+        CONFIG.screen1.button;
+
+    nextBtn.style.display =
+        "inline-block";
+
+    choiceArea.style.display =
+        "none";
+}
+
+
+/* =========================================================
+   SCREEN 2
+   ========================================================= */
+
+function showScreen2() {
+
+    sticker.src =
+        CONFIG.screen2.sticker;
+
+    headline.innerHTML =
+        "";
+
+    description.innerHTML =
+        CONFIG.screen2.description;
+
+    nextBtn.innerHTML =
+        CONFIG.screen2.button;
+
+    nextBtn.style.display =
+        "inline-block";
+
+    choiceArea.style.display =
+        "none";
+}
+
+
+/* =========================================================
+   CHOICE SCREEN
+   ========================================================= */
+
+function showChoice() {
+
+    sticker.src =
+        CONFIG.choice.sticker;
+
+    headline.innerHTML =
+        "";
+
+    description.innerHTML =
+        CONFIG.choice.description;
+
+    nextBtn.style.display =
+        "none";
+
+    choiceArea.style.display =
+        "block";
+
+    wrongBtn.innerHTML =
+        CONFIG.choice.wrongButton;
+
+    rightBtn.innerHTML =
+        CONFIG.choice.rightButton;
+
+    wrongCount = 0;
+
+    rightSize = 1;
+
+    wrongSize = 1;
+
+    wrongBtn.style.opacity =
+        "1";
+
+    wrongBtn.style.pointerEvents =
+        "auto";
+
+    wrongBtn.style.transform =
+        "translateY(-50%) scale(1)";
+
+    rightBtn.style.transform =
+        "translateY(-50%) scale(1)";
+}
+
+
+/* =========================================================
+   NEXT BUTTON
+   ========================================================= */
+
+nextBtn.addEventListener("click", function() {
+
+    animateChange();
+
+    setTimeout(function() {
+
+        if (currentScreen === 1) {
+
+            currentScreen = 2;
+
+            showScreen2();
+
+        }
+
+        else if (currentScreen === 2) {
+
+            currentScreen = 3;
+
+            showChoice();
+
+        }
+
+    }, 150);
+
+});
+
+
+/* =========================================================
+   WRONG BUTTON
+   ========================================================= */
+
+wrongBtn.addEventListener("click", function() {
+
+    if (
+        wrongCount >=
+        CONFIG.wrongAttempts.length
+    ) {
+        return;
+    }
+
+
+    const attempt =
+        CONFIG.wrongAttempts[wrongCount];
+
+
+    /* Change GIF */
+
+    sticker.src =
+        attempt.sticker;
+
+
+    /* Change description */
+
+    description.innerHTML =
+        attempt.description;
+
+
+    /* Count wrong attempt */
+
+    wrongCount++;
+
+
+    /* Make correct button bigger */
+
+    rightSize += 0.45;
+
+
+    /* Make wrong button smaller */
+
+    wrongSize -= 0.13;
+
+
+    if (wrongSize < 0.35) {
+
+        wrongSize = 0.35;
+
+    }
+
+
+    rightBtn.style.transform =
+        `translateY(-50%) scale(${rightSize})`;
+
+
+    wrongBtn.style.transform =
+        `translateY(-50%) scale(${wrongSize})`;
+
+
+    /* Sticker animation */
+
+    sticker.classList.remove("fade");
+
+    void sticker.offsetWidth;
+
+    sticker.classList.add("fade");
+
+
+    /*
+       After the final wrong attempt,
+       completely disable the wrong button.
+    */
+
+    if (
+        wrongCount >=
+        CONFIG.wrongAttempts.length
+    ) {
+
+        wrongBtn.style.opacity =
+            "0.15";
+
+        wrongBtn.style.pointerEvents =
+            "none";
+    }
+
+});
+
+
+/* =========================================================
+   RIGHT BUTTON
+   ========================================================= */
+
+rightBtn.addEventListener("click", function() {
+
+    showFinal();
+
+});
+
+
+/* =========================================================
+   FINAL SCREEN
+   ========================================================= */
+
+function showFinal() {
+
+    choiceArea.style.display =
+        "none";
+
+    headline.innerHTML =
+        "";
+
+    sticker.src =
+        CONFIG.final.sticker;
+
+    description.innerHTML =
+        CONFIG.final.description;
+
+    nextBtn.innerHTML =
+        CONFIG.final.button;
+
+    nextBtn.style.display =
+        "inline-block";
+
+
+    app.classList.remove("final-message");
+
+    void app.offsetWidth;
+
+    app.classList.add("final-message");
+
+
+    createConfetti();
+
+    createFloatingEffects();
+
+
+    /*
+       Final button can be pressed
+       repeatedly for more effects.
+    */
+
+    nextBtn.onclick =
+        function() {
+
+            createConfetti();
+
+            createFloatingEffects();
+
+        };
+
+}
+
+
+/* =========================================================
+   CONFETTI
+   ========================================================= */
+
+function createConfetti() {
+
+    for (
+        let i = 0;
+        i < 80;
+        i++
+    ) {
+
+        const piece =
+            document.createElement("div");
+
+        piece.className =
+            "confetti";
+
+        piece.style.left =
+            Math.random() * 100 + "vw";
+
+        piece.style.animationDelay =
+            Math.random() * 1.5 + "s";
+
+        piece.style.background =
+            `hsl(
+                ${Math.random() * 360},
+                80%,
+                65%
+            )`;
+
+        piece.style.width =
+            6 + Math.random() * 8 + "px";
+
+        piece.style.height =
+            6 + Math.random() * 8 + "px";
+
+
+        document.body.appendChild(piece);
+
+
+        setTimeout(function() {
+
+            piece.remove();
+
+        }, 4000);
+
+    }
+
+}
+
+
+/* =========================================================
+   FLOATING EFFECTS
+   ========================================================= */
+
+function createFloatingEffects() {
+
+    const effects = [
+
+        "💖",
+        "💕",
+        "✨",
+        "💗",
+        "🌸",
+        "⭐",
+        "🎉"
+
+    ];
+
+
+    for (
+        let i = 0;
+        i < 25;
+        i++
+    ) {
+
+        const effect =
+            document.createElement("div");
+
+        effect.className =
+            "float-effect";
+
+        effect.innerHTML =
+            effects[
+                Math.floor(
+                    Math.random() *
+                    effects.length
+                )
+            ];
+
+        effect.style.left =
+            Math.random() * 100 + "vw";
+
+        effect.style.animationDelay =
+            Math.random() * 2 + "s";
+
+
+        document.body.appendChild(effect);
+
+
+        setTimeout(function() {
+
+            effect.remove();
+
+        }, 5000);
+
+    }
+
+}
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+showScreen1();
+
+</script>
+
+</body>
+</html>
